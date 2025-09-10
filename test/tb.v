@@ -9,7 +9,7 @@ module tb;
     wire out;
 
     // Instantiate DUT
-    dut uut (
+    tt_um_example uut (
         .clk  (clk),
         .rst_n(rst_n),
         .in   (in),
