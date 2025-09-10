@@ -31,8 +31,9 @@ MODULE           = test
 # Always emit results.xml here
 export COCOTB_RESULTS_FILE := $(PWD)/results.xml
 
-# VCD dumping (you also added $dumpfile in tb.v — both are fine)
 WAVES ?= 1
-export IVERILOG_DUMPER := vcd
+export IVERILOG_DUMPER := fst       # or vcd, either is fine
+export DUMPFILE := $(PWD)/tb.vcd    # matches your CI upload path
+
 
 include $(shell cocotb-config --makefiles)/Makefile.sim
