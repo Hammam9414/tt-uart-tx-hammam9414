@@ -1,4 +1,4 @@
-// tb.v : minimal testbench shell for cocotb
+// test/tb.v : minimal testbench shell for cocotb
 `timescale 1ns/1ps
 `default_nettype none
 
@@ -10,16 +10,24 @@ module tb;
 
     // Instantiate DUT
     dut uut (
-        .clk(clk),
+        .clk  (clk),
         .rst_n(rst_n),
-        .in(in),
-        .out(out)
+        .in   (in),
+        .out  (out)
     );
 
-    // Initial values only — cocotb will drive clock and signals
+    // Seed known values; cocotb will drive the clock & signals
     initial begin
         clk   = 1'b0;
         rst_n = 1'b0;
         in    = 1'b0;
     end
+
+    // Force a VCD at the exact path your CI uploads
+`ifdef COCOTB_SIM
+    initial begin
+        $dumpfile("test/tb.vcd");
+        $dumpvars(0, tb);
+    end
+`endif
 endmodule
