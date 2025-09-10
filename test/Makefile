@@ -40,5 +40,12 @@ TOPLEVEL = tb
 # MODULE is the basename of the Python test file
 MODULE = test
 
+
+EXTRA_ARGS += -g2012
+export COCOTB_RESULTS_FILE = $(PWD)/results.xml
+WAVES ?= 1
+export IVERILOG_DUMPER = vcd
+
+
 # include cocotb's make rules to take care of the simulator setup
 include $(shell cocotb-config --makefiles)/Makefile.sim
