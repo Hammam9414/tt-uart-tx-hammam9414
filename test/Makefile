@@ -1,11 +1,10 @@
-# test/Makefile
-
 SIM            ?= icarus
 TOPLEVEL_LANG  ?= verilog
 
 SRC_DIR         = $(PWD)/../src
 PROJECT_SOURCES = project.v
 
+# GL when GATES=yes
 ifneq ($(GATES),yes)
   SIM_BUILD        = sim_build/rtl
   VERILOG_SOURCES += $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
@@ -17,26 +16,17 @@ else
   VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
 endif
 
-# Include design headers
-COMPILE_ARGS    += -I$(SRC_DIR)
-
-# **Use COMPILE_ARGS, not EXTRA_ARGS, for -g2012**
-COMPILE_ARGS    += -g2012
-
-# Testbench & Python module
+COMPILE_ARGS    += -I$(SRC_DIR) -g2012
 VERILOG_SOURCES += $(PWD)/tb.v
 TOPLEVEL         = tb
 MODULE           = test
 
-# Always emit results.xml here
+# Make sure this matches your CI 'test-summary' step
 export COCOTB_RESULTS_FILE := $(PWD)/results.xml
 
+# Waves: use fst (default in cocotb for Icarus) and tell CI where to look
 WAVES ?= 1
-export IVERILOG_DUMPER := fst       # or vcd, either is fine
-export DUMPFILE := $(PWD)/tb.vcd    # matches your CI upload path
-# test/Makefile
-export DUMPFILE := $(PWD)/tb.fst        # match your upload step
-
-
+export IVERILOG_DUMPER := fst
+export COCOTB_DUMP_FILE := $(SIM_BUILD)/tb.fst
 
 include $(shell cocotb-config --makefiles)/Makefile.sim
