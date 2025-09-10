@@ -1,3 +1,4 @@
+# test/test.py
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge
@@ -6,8 +7,7 @@ CLK_HZ = 100_000_000
 BAUD   = 1_000_000
 CLKS_PER_BIT = CLK_HZ // BAUD  # 100
 
-def tx_bit(dut):
-    # TX is on uo_out[0]
+def tx_bit(dut):  # TX is uo_out[0]
     return int(dut.uo_out.value) & 1
 
 async def reset(dut):
@@ -22,7 +22,7 @@ async def reset(dut):
     await RisingEdge(dut.clk)
 
 async def pulse_start(dut):
-    dut.uio_in.value = 1  # set bit0
+    dut.uio_in.value = 1
     await RisingEdge(dut.clk)
     dut.uio_in.value = 0
 
@@ -30,12 +30,12 @@ async def check_frame(dut, b: int):
     # wait for start (line goes low)
     while tx_bit(dut) != 0:
         await RisingEdge(dut.clk)
-    # sample middle of start bit
+    # middle of start bit
     for _ in range(CLKS_PER_BIT // 2):
         await RisingEdge(dut.clk)
     assert tx_bit(dut) == 0, "start != 0"
 
-    # sample 8 data bits, LSB first
+    # 8 data bits, LSB first
     for i in range(8):
         for _ in range(CLKS_PER_BIT):
             await RisingEdge(dut.clk)
@@ -48,6 +48,7 @@ async def check_frame(dut, b: int):
 
 @cocotb.test()
 async def basic(dut):
+    # cocotb drives the clock (tb.v does not)
     cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())  # 100 MHz
     await reset(dut)
     for v in (0x55, 0xA5, 0x00):
