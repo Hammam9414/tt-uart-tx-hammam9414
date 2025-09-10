@@ -31,7 +31,7 @@ module tb;
 
 `ifdef COCOTB_SIM
     initial begin
-        $dumpfile("test/tb.vcd");
+        $dumpfile("tb.vcd");   // <-- no "test/" prefix
         $dumpvars(0, tb);
     end
 `endif
