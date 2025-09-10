@@ -1,28 +1,37 @@
-# test.py : cocotb test
+# test/test.py
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge
 
 
 @cocotb.test()
-async def basic_test(tt_um_example):
-    """Simple test: reset, then drive in=0/1 and check out == ~in"""
-    # Start clock (10 ns period = 100 MHz)
-    cocotb.start_soon(Clock(tt_um_example.clk, 10, units="ns").start())
+async def basic(dut):
+    """Reset, enable design, then verify uo_out[0] == ~ui_in[0]."""
+    # Start 100 MHz clock
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
 
-    # Apply reset
-    tt_um_example.rst_n.value = 0
+    # Reset & init
+    dut.rst_n.value = 0
+    dut.ena.value   = 0
+    dut.ui_in.value = 0
+    dut.uio_in.value = 0
     for _ in range(2):
-        await RisingEdge(tt_um_example.clk)
-    tt_um_example.rst_n.value = 1
-    await RisingEdge(tt_um_example.clk)
+        await RisingEdge(dut.clk)
+    dut.rst_n.value = 1
+    dut.ena.value   = 1
+    await RisingEdge(dut.clk)
 
-    # Drive input 0 -> expect out=1
-    tt_um_example.in.value = 0
-    await RisingEdge(tt_um_example.clk)
-    assert tt_um_example.out.value == 1, f"Expected 1, got {tt_um_example.out.value}"
+    # ui_in[0] = 0 -> uo_out[0] should be 1
+    dut.ui_in.value = 0b0000_0000
+    await RisingEdge(dut.clk)
+    assert (int(dut.uo_out.value) & 1) == 1, f"Expected 1, got {int(dut.uo_out.value) & 1}"
 
-    # Drive input 1 -> expect out=0
-    tt_um_example.in.value = 1
-    await RisingEdge(tt_um_example.clk)
-    assert tt_um_example.out.value == 0, f"Expected 0, got {tt_um_example.out.value}"
+    # ui_in[0] = 1 -> uo_out[0] should be 0
+    dut.ui_in.value = 0b0000_0001
+    await RisingEdge(dut.clk)
+    assert (int(dut.uo_out.value) & 1) == 0, f"Expected 0, got {int(dut.uo_out.value) & 1}"
+
+    # Disable -> outputs forced to 0
+    dut.ena.value = 0
+    await RisingEdge(dut.clk)
+    assert int(dut.uo_out.value) == 0, f"Expected 0 when ena=0, got {int(dut.uo_out.value)}"
