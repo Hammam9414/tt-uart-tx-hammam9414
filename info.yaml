@@ -1,7 +1,7 @@
 # Tiny Tapeout project information
 project:
   title:        "UART-TX (1 start, 8 data, 1 stop)"
-  author:       "Hammam"
+  author:       "Hammam9414"
   discord:      ""
   description:  "LSB-first UART transmitter; ui_in=byte, uio_in[0]=start, uo_out[0]=tx"
   language:     "Verilog"
