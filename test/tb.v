@@ -34,6 +34,12 @@ module tb;
 `ifdef COCOTB_SIM
     // Let cocotb generate fst/vcd – this block is optional.
 `endif
+
+`ifdef GL_TEST
+  supply1 VPWR, VDD, vccd1;
+  supply0 VGND, VSS, vssd1;
+`endif
+
 endmodule
 
 `default_nettype wire
