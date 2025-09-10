@@ -1,6 +1,6 @@
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge, ClockCycles, ReadOnly
+from cocotb.triggers import RisingEdge, ClockCycles, ReadOnly, Timer  # <-- added Timer
 
 
 def lsb_safe(dut):
@@ -16,10 +16,12 @@ def lsb_safe(dut):
 async def expect_lsb(dut, exp, tries=20):
     for _ in range(tries):
         await RisingEdge(dut.clk)
-        await ReadOnly()             # <- let NBA updates settle
+        await ReadOnly()             # let NBA updates settle
         got = lsb_safe(dut)
         if got is not None:
             assert got == exp, f"Expected {exp}, got {got}"
+            # leave the ReadOnly phase before caller writes any signals
+            await Timer(0, units="ns")    # <-- added
             return
     assert False, "uo_out[0] stayed X/Z too long"
 
