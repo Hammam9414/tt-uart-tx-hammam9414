@@ -28,11 +28,4 @@ module tb;
         ui_in  = 8'h00;
         uio_in = 8'h00;
     end
-
-`ifdef COCOTB_SIM
-    initial begin
-        $dumpfile("tb.vcd");   // <-- no "test/" prefix
-        $dumpvars(0, tb);
-    end
-`endif
 endmodule
