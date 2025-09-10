@@ -2,7 +2,7 @@
 `timescale 1ns/1ps
 `default_nettype none
 
-module dut (
+module tt_um_example (
     input  wire clk,
     input  wire rst_n,
     input  wire in,
