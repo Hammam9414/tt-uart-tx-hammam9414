@@ -4,10 +4,11 @@ from cocotb.triggers import RisingEdge
 
 CLK_HZ = 100_000_000
 BAUD   = 1_000_000
-CLKS_PER_BIT = CLK_HZ // BAUD
+CLKS_PER_BIT = CLK_HZ // BAUD  # 100
 
 def tx_bit(dut):
-    return int(dut.uo_out.value) & 1  # TX on bit0
+    # TX is on uo_out[0]
+    return int(dut.uo_out.value) & 1
 
 async def reset(dut):
     dut.ena.value = 0
@@ -21,27 +22,29 @@ async def reset(dut):
     await RisingEdge(dut.clk)
 
 async def pulse_start(dut):
-    dut.uio_in.value = 1
+    dut.uio_in.value = 1  # set bit0
     await RisingEdge(dut.clk)
     dut.uio_in.value = 0
 
-async def check_frame(dut, b):
-    # wait for start
+async def check_frame(dut, b: int):
+    # wait for start (line goes low)
     while tx_bit(dut) != 0:
         await RisingEdge(dut.clk)
-    # mid-start
+    # sample middle of start bit
     for _ in range(CLKS_PER_BIT // 2):
         await RisingEdge(dut.clk)
-    assert tx_bit(dut) == 0
-    # data bits LSB first
+    assert tx_bit(dut) == 0, "start != 0"
+
+    # sample 8 data bits, LSB first
     for i in range(8):
         for _ in range(CLKS_PER_BIT):
             await RisingEdge(dut.clk)
         assert tx_bit(dut) == ((b >> i) & 1), f"bit{i} mismatch"
-    # stop
+
+    # stop bit
     for _ in range(CLKS_PER_BIT):
         await RisingEdge(dut.clk)
-    assert tx_bit(dut) == 1
+    assert tx_bit(dut) == 1, "stop != 1"
 
 @cocotb.test()
 async def basic(dut):
