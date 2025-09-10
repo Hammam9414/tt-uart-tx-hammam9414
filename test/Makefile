@@ -34,6 +34,9 @@ export COCOTB_RESULTS_FILE := $(PWD)/results.xml
 WAVES ?= 1
 export IVERILOG_DUMPER := fst       # or vcd, either is fine
 export DUMPFILE := $(PWD)/tb.vcd    # matches your CI upload path
+# test/Makefile
+export DUMPFILE := $(PWD)/tb.fst        # match your upload step
+
 
 
 include $(shell cocotb-config --makefiles)/Makefile.sim
