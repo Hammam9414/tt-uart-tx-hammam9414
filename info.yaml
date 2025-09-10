@@ -1,38 +1,26 @@
-# Tiny Tapeout project information
 project:
-  title:        "UART-TX (1 start, 8 data, 1 stop)"
+  title:        "Tiny Inverter (1-bit)"
   author:       "Hammam9414"
   discord:      ""
-  description:  "LSB-first UART transmitter; ui_in=byte, uio_in[0]=start, uo_out[0]=tx"
+  description:  "uo_out[0] = ~ui_in[0] when ena=1; others 0. Simple TT harness demo."
   language:     "Verilog"
   clock_hz:     100000000
-
-  # How many tiles your design occupies? A single tile is about 167x108 uM.
-  tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
-
-  # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_example"
-
-  # List your project's source files here.
-  # Source files must be in ./src and you must list each source file separately, one per line.
-  # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
+  tiles:        "1x1"
+  top_module:   "tt_um_example"
   source_files:
     - "project.v"
 
-# The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
-# This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
 pinout:
-  # Inputs
-  ui[0]: "data[0]"
-  ui[1]: "data[1]"
-  ui[2]: "data[2]"
-  ui[3]: "data[3]"
-  ui[4]: "data[4]"
-  ui[5]: "data[5]"
-  ui[6]: "data[6]"
-  ui[7]: "data[7]"
+  ui[0]: "IN"
+  ui[1]: ""
+  ui[2]: ""
+  ui[3]: ""
+  ui[4]: ""
+  ui[5]: ""
+  ui[6]: ""
+  ui[7]: ""
 
-  uo[0]: "tx"
+  uo[0]: "OUT"
   uo[1]: ""
   uo[2]: ""
   uo[3]: ""
@@ -41,7 +29,7 @@ pinout:
   uo[6]: ""
   uo[7]: ""
 
-  uio[0]: "start"
+  uio[0]: ""
   uio[1]: ""
   uio[2]: ""
   uio[3]: ""
@@ -50,5 +38,4 @@ pinout:
   uio[6]: ""
   uio[7]: ""
 
-# Do not change!
 yaml_version: 6
