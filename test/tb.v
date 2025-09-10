@@ -19,12 +19,14 @@ module tb;
 
     // Start values; **no** stimulus here
     initial begin
-        ui_in  = 8'h00;
-        uio_in = 8'h00;
-        ena    = 1'b0;
-        clk    = 1'b0;
-        rst_n  = 1'b0;
-    end
+  clk      = 1'b0;
+  rst      = 1'b1;
+  start    = 1'b0;
+  data_in  = 8'h00;
+  // optional: other pins -> known values
+  repeat (5) @(posedge clk);
+  rst = 1'b0;
+end
 
     // Let cocotb drive the clock, so no always #5 and **no $finish** here.
 endmodule
