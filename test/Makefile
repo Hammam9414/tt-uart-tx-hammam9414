@@ -1,32 +1,44 @@
-SIM            ?= icarus
-TOPLEVEL_LANG  ?= verilog
+# Makefile
+# See https://docs.cocotb.org/en/stable/quickstart.html for more info
 
-SRC_DIR         = $(PWD)/../src
+# defaults
+SIM ?= icarus
+TOPLEVEL_LANG ?= verilog
+SRC_DIR = $(PWD)/../src
 PROJECT_SOURCES = project.v
 
-# GL when GATES=yes
 ifneq ($(GATES),yes)
-  SIM_BUILD        = sim_build/rtl
-  VERILOG_SOURCES += $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
+
+# RTL simulation:
+SIM_BUILD				= sim_build/rtl
+VERILOG_SOURCES += $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
+
 else
-  SIM_BUILD        = sim_build/gl
-  COMPILE_ARGS    += -DGL_TEST -DFUNCTIONAL -DUSE_POWER_PINS -DSIM -DUNIT_DELAY=\#1
-  VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
-  VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
-  VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
+
+# Gate level simulation:
+SIM_BUILD				= sim_build/gl
+COMPILE_ARGS    += -DGL_TEST
+COMPILE_ARGS    += -DFUNCTIONAL
+COMPILE_ARGS    += -DUSE_POWER_PINS
+COMPILE_ARGS    += -DSIM
+COMPILE_ARGS    += -DUNIT_DELAY=\#1
+VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
+VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
+
+# this gets copied in by the GDS action workflow
+VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
+
 endif
 
-COMPILE_ARGS    += -I$(SRC_DIR) -g2012
+# Allow sharing configuration between design and testbench via `include`:
+COMPILE_ARGS 		+= -I$(SRC_DIR)
+
+# Include the testbench sources:
 VERILOG_SOURCES += $(PWD)/tb.v
-TOPLEVEL         = tb
-MODULE           = test
+TOPLEVEL = tb
 
-# Make sure this matches your CI 'test-summary' step
-export COCOTB_RESULTS_FILE := $(PWD)/results.xml
+# MODULE is the basename of the Python test file
+MODULE = test
 
-# Waves: use fst (default in cocotb for Icarus) and tell CI where to look
-WAVES ?= 1
-export IVERILOG_DUMPER := fst
-export COCOTB_DUMP_FILE := $(SIM_BUILD)/tb.fst
-
+# include cocotb's make rules to take care of the simulator setup
 include $(shell cocotb-config --makefiles)/Makefile.sim
